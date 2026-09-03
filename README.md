@@ -2,6 +2,11 @@
 
 **SafetyFirst Dashboard** is an interactive web application for construction site safety supervision. It provides real-time worker monitoring, PPE (Personal Protective Equipment) compliance analysis, incident detection, and personalized improvement recommendations using data from robots (Unitree), wearable sensors, and incident logs.
 
+## 🌐 Live Demo & Source
+
+- **Live demo:** <https://safety-first-dashboard-app.vercel.app/>
+- **Repository:** <https://github.com/ckapsalis2710/safety-first-dashboard-app>
+
 ---
 
 ## ✨ Features
@@ -60,7 +65,7 @@ The app will be available at **http://localhost:5173**.
 ## 📁 Project Structure
 
 ```
-safetyfirstdashboard/
+safety-first-dashboard-app/
 ├── index.html
 ├── package.json
 ├── vite.config.ts
