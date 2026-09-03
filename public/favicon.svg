@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!-- Shield with brand colors -->
+  <path d="M50 8 L92 28 L92 54 C92 80 74 96 50 100 C26 96 8 80 8 54 L8 28 Z" 
+        fill="#1A237E" stroke="#0D1442" stroke-width="2" />
+  
+  <!-- Shield inner highlight -->
+  <path d="M50 16 L84 32 L84 54 C84 76 68 90 50 94 C32 90 16 76 16 54 L16 32 Z" 
+        fill="#283593" opacity="0.6" />
+  
+  <!-- White checkmark -->
+  <path d="M32 50 L44 62 L72 34" 
+        stroke="#FFFFFF" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+  
+  <!-- Subtle shine effect -->
+  <ellipse cx="40" cy="35" rx="15" ry="8" fill="#FFFFFF" opacity="0.08" transform="rotate(-30 40 35)" />
+</svg>
