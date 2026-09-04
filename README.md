@@ -20,6 +20,7 @@
 | **Incidents** | Monthly incident trend (bubble chart), distribution by shift hour (bar chart), top incident conditions, incident log |
 | **Robot Unitree** | Simulated camera live feed, robot status (battery, connection, mode, temperature, gas), sorted detection list, patrol route |
 | **Recommendations** | Personalized PPE recommendations per worker (based on actual PPE gaps), send/acknowledge recommendations, data sources overview |
+| **Loading Skeletons:** | Enhances user experience with smooth loading states across all pages (Dashboard, Sites, Robot, etc.), indicating when data is being fetched |
 
 ---
 
