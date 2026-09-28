@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material';
 import type { Alert, Worker } from '../../types';
+import { getAlertCounts } from '../../domain/alerts';
 
 interface AlertsPanelProps {
   alerts: Alert[];
@@ -52,17 +53,7 @@ const AlertsPanel = ({
     return filtered;
   }, [alerts, alertFilterSeverity, alertFilterWorker]);
 
-  const alertCounts = useMemo(() => {
-    const active = alerts.filter((alert) => !alert.acknowledged);
-
-    return {
-      critical: active.filter((alert) => alert.severity === 'critical').length,
-      high: active.filter((alert) => alert.severity === 'high').length,
-      medium: active.filter((alert) => alert.severity === 'medium').length,
-      low: active.filter((alert) => alert.severity === 'low').length,
-      total: active.length,
-    };
-  }, [alerts]);
+  const alertCounts = getAlertCounts(alerts);
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {

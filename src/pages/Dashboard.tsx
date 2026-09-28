@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import {
   Box,
   Grid,
@@ -19,6 +19,7 @@ import { DashboardSkeleton } from '../components/skeletons/DashboardSkeleton';
 import { getDashboardData } from '../data/enrichedData';
 import { useSimulatedLoading } from '../hooks/useSimulatedLoading';
 import type { ReactNode } from 'react';
+import { getAlertCounts } from '../domain/alerts';
 
 interface DashboardProps {
   toggleTheme: () => void;
@@ -34,16 +35,7 @@ const Dashboard = ({ toggleTheme, isDarkMode, notificationMenu, alerts, onAcknow
   const loading = useSimulatedLoading(700);
 
   // Alert counts by severity
-  const alertCounts = useMemo(() => {
-    const active = alerts.filter(a => !a.acknowledged);
-    return {
-      critical: active.filter(a => a.severity === 'critical').length,
-      high: active.filter(a => a.severity === 'high').length,
-      medium: active.filter(a => a.severity === 'medium').length,
-      low: active.filter(a => a.severity === 'low').length,
-      total: active.length,
-    };
-  }, [alerts]);
+  const alertCounts = getAlertCounts(alerts);
 
   // KPI Data
   const kpis = [
