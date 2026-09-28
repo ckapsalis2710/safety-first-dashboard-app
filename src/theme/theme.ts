@@ -41,22 +41,37 @@ export const getTheme = (mode: 'light' | 'dark'): ThemeOptions => ({
   },
   typography: {
     fontFamily: '"Plus Jakarta Sans", "Roboto", "Helvetica", "Arial", sans-serif',
+
     h4: {
       fontWeight: 600,
+      fontSize: '1.8rem',
       letterSpacing: '-0.02em',
     },
+
     h5: {
       fontWeight: 600,
+      fontSize: '1.4rem',
       letterSpacing: '-0.01em',
     },
+
     h6: {
       fontWeight: 600,
+      fontSize: '1.15rem',
     },
+
     subtitle1: {
       fontWeight: 500,
+      fontSize: '0.95rem',
     },
+
     body1: {
-      lineHeight: 1.6,
+      fontSize: '0.9rem',
+      lineHeight: 1.5,
+    },
+
+    body2: {
+      fontSize: '0.8rem',
+      lineHeight: 1.45,
     },
   },
   shape: {
