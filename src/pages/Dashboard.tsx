@@ -65,7 +65,8 @@ const Dashboard = ({ toggleTheme, isDarkMode, notificationMenu, alerts, onAcknow
       .filter((worker) =>
         worker.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         worker.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        worker.site.toLowerCase().includes(searchTerm.toLowerCase())
+        worker.site.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        worker.zone.toLowerCase().includes(searchTerm.toLowerCase())
       )
       .filter((worker) => {
         if (filterTab === 0) return true;
@@ -232,7 +233,7 @@ const Dashboard = ({ toggleTheme, isDarkMode, notificationMenu, alerts, onAcknow
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
                 <TextField
                   size="small"
-                  placeholder="Search by name / role..."
+                  placeholder="Search workers..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   sx={{ flex: '0 1 260px' }}
