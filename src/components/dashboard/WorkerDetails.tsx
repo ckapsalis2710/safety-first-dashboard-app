@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { Box, Typography, Chip, Grid, useTheme, Paper } from '@mui/material';
 import { Check, Close, BatteryChargingFull, Favorite } from '@mui/icons-material';
 import {
@@ -16,14 +15,6 @@ interface WorkerDetailsProps {
   worker: Worker | null;
 }
 
-// Generate heart rate data for the last hour (12 data points)
-const generateHeartRateData = (baseHeartRate: number) => {
-  return Array.from({ length: 12 }, (_, i) => ({
-    minute: `${i * 5}m`,
-    heartRate: Math.max(60, Math.min(120, baseHeartRate + (Math.random() - 0.5) * 15)),
-  }));
-};
-
 const WorkerDetails = ({ worker }: WorkerDetailsProps) => {
   const theme = useTheme();
 
@@ -35,10 +26,10 @@ const WorkerDetails = ({ worker }: WorkerDetailsProps) => {
     );
   }
 
-  // Memoize heart rate data - only regenerates when worker changes
-  const heartRateData = useMemo(() => {
-    return generateHeartRateData(worker.heartRate);
-  }, [worker.heartRate]);
+  const heartRateData = worker.hourlyHeartRate.map((heartRate, index) => ({
+    measurement: index + 1,
+    heartRate,
+  }));
 
   // Get avatar color based on name (same as in table)
   const getAvatarColor = (name: string) => {
@@ -130,11 +121,11 @@ const WorkerDetails = ({ worker }: WorkerDetailsProps) => {
                 <ResponsiveContainer width="100%" height={100}>
                   <LineChart data={heartRateData}>
                     <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />
-                    <XAxis 
-                      dataKey="minute" 
-                      tick={{ fontSize: 8 }} 
+                    <XAxis
+                      dataKey="measurement"
+                      tick={{ fontSize: 8 }}
                       stroke={theme.palette.text.secondary}
-                      interval={2}
+                      interval={0}
                     />
                     <YAxis 
                       domain={[60, 120]} 
