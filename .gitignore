@@ -22,3 +22,14 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Monorepo / tooling
+*.tsbuildinfo
+.turbo
+.nx/cache
+coverage
+.env
+.env.*
+!.env.example
+apps/*/dist
+packages/*/dist

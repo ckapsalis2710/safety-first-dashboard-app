@@ -1,0 +1,8 @@
+{
+  "name": "@safety-first/api",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "echo 'Nest API scaffold comes in step 1'"
+  }
+}

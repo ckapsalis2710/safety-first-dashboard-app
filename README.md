@@ -38,14 +38,26 @@
 
 ---
 
+## 🏗️ Architecture
+
+This repository is an **npm workspaces monorepo** (step 0 of a NestJS full-stack migration).
+
+| Package | Path | Role |
+|---------|------|------|
+| `@safety-first/web` | `apps/web` | React + Vite frontend (current dashboard UI) |
+| `@safety-first/api` | `apps/api` | NestJS API placeholder — Nest + Drizzle + Postgres arrive in step 1 |
+| `@safety-first/shared` | `packages/shared` | Shared TypeScript types used by web (and later by the API) |
+
+**Monorepo note:** Install once at the repo root (`npm install`). Use root scripts `dev:web`, `build:web`, and `lint`, or run workspace commands with `-w @safety-first/web`. The API package is intentionally a stub until the Nest scaffold lands.
+
 ## 🚀 Installation & Usage
 
 ```bash
-# 1. Install dependencies
+# 1. Install dependencies (from repo root — npm workspaces)
 npm install
 
-# 2. Start development server (hot-reload)
-npm run dev
+# 2. Start the web app (hot-reload)
+npm run dev:web
 ```
 
 The app will be available at **http://localhost:5173**.
@@ -56,10 +68,11 @@ The app will be available at **http://localhost:5173**.
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start development server |
-| `npm run build` | TypeScript compilation + production build (output: `dist/`) |
-| `npm run preview` | Preview production build locally |
-| `npm run lint` | Lint code with ESLint |
+| `npm run dev:web` | Start Vite dev server for `@safety-first/web` |
+| `npm run build:web` | TypeScript + production build for the web app |
+| `npm run lint` | Lint the web app with ESLint |
+| `npm run dev -w @safety-first/web` | Same as `dev:web` (workspace form) |
+| `npm run preview -w @safety-first/web` | Preview production build locally |
 
 ---
 
@@ -67,36 +80,27 @@ The app will be available at **http://localhost:5173**.
 
 ```
 safety-first-dashboard-app/
-├── index.html
-├── package.json
-├── vite.config.ts
-├── eslint.config.js
-├── public/
-└── src/
-    ├── main.tsx                 # Entry point
-    ├── App.tsx                  # Routing & ThemeProvider
-    ├── index.css                # Global styles & Inter font
-    ├── types/index.ts           # TypeScript types
-    ├── theme/theme.ts           # MUI theme (light/dark)
-    ├── data/
-    │   ├── mockData.ts          # Mock data
-    │   └── enrichedData.ts      # Data helpers
-    ├── components/
-    │   ├── common/
-    │   │   ├── Layout/Layout.tsx
-    │   │   ├── Layout/Sidebar.tsx
-    │   │   ├── PageHeader.tsx
-    │   │   └── NotificationMenu.tsx
-    │   └── dashboard/
-    │       └── WorkerDetails.tsx
-    └── pages/
-        ├── Dashboard.tsx
-        ├── WorkerHistoryPage.tsx
-        ├── RoleAnalysisPage.tsx
-        ├── SitesPage.tsx
-        ├── IncidentsPage.tsx
-        ├── RobotPage.tsx
-        └── RecommendationsPage.tsx
+├── package.json                 # workspaces root (apps/*, packages/*)
+├── apps/
+│   ├── web/                     # React + Vite frontend (@safety-first/web)
+│   │   ├── index.html
+│   │   ├── vite.config.ts
+│   │   ├── package.json
+│   │   ├── public/
+│   │   └── src/
+│   │       ├── main.tsx
+│   │       ├── App.tsx
+│   │       ├── types/index.ts   # thin re-export from @safety-first/shared
+│   │       ├── theme/
+│   │       ├── data/
+│   │       ├── components/
+│   │       ├── domain/
+│   │       ├── hooks/
+│   │       └── pages/
+│   └── api/                     # NestJS placeholder (@safety-first/api)
+└── packages/
+    └── shared/                  # Shared types (@safety-first/shared)
+        └── src/index.ts
 ```
 
 ---
