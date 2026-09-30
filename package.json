@@ -4,7 +4,14 @@
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
     "dev:web": "npm run dev -w @safety-first/web",
+    "dev:api": "npm run dev -w @safety-first/api",
     "build:web": "npm run build -w @safety-first/web",
-    "lint": "npm run lint -w @safety-first/web"
+    "build:api": "npm run build -w @safety-first/api",
+    "lint": "npm run lint -w @safety-first/web",
+    "db:up": "docker compose up -d postgres",
+    "db:down": "docker compose down",
+    "db:push": "npm run db:push -w @safety-first/api",
+    "db:seed": "npm run db:seed -w @safety-first/api",
+    "typecheck:api": "npm run typecheck -w @safety-first/api"
   }
 }

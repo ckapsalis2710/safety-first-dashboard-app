@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: safety-first-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: safety
+      POSTGRES_PASSWORD: safety
+      POSTGRES_DB: safety_first
+    ports:
+      - "5432:5432"
+    volumes:
+      - safety_first_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U safety -d safety_first"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Optional stub — unused by step 1 API
+  redis:
+    image: redis:7-alpine
+    container_name: safety-first-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    profiles:
+      - redis
+
+volumes:
+  safety_first_pgdata:

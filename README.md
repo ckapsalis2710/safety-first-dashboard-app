@@ -35,20 +35,23 @@
 | **React Router 7** | SPA routing |
 | **Recharts 3** | Charts (Bar, Line) |
 | **Emotion 11** | CSS-in-JS styling |
+| **NestJS 11** | Backend API (`apps/api`) |
+| **Drizzle ORM** | PostgreSQL schema & queries |
+| **PostgreSQL 16** | Primary database (Docker Compose) |
 
 ---
 
 ## 🏗️ Architecture
 
-This repository is an **npm workspaces monorepo** (step 0 of a NestJS full-stack migration).
+This repository is an **npm workspaces monorepo** (NestJS full-stack migration — step 1 API).
 
 | Package | Path | Role |
 |---------|------|------|
 | `@safety-first/web` | `apps/web` | React + Vite frontend (current dashboard UI) |
-| `@safety-first/api` | `apps/api` | NestJS API placeholder — Nest + Drizzle + Postgres arrive in step 1 |
+| `@safety-first/api` | `apps/api` | NestJS + Drizzle + PostgreSQL REST API |
 | `@safety-first/shared` | `packages/shared` | Shared TypeScript types used by web (and later by the API) |
 
-**Monorepo note:** Install once at the repo root (`npm install`). Use root scripts `dev:web`, `build:web`, and `lint`, or run workspace commands with `-w @safety-first/web`. The API package is intentionally a stub until the Nest scaffold lands.
+**Monorepo note:** Install once at the repo root (`npm install`). Use root scripts `dev:web`, `dev:api`, `db:up`, `db:seed`, etc., or run workspace commands with `-w @safety-first/web` / `-w @safety-first/api`.
 
 ## 🚀 Installation & Usage
 
@@ -56,11 +59,20 @@ This repository is an **npm workspaces monorepo** (step 0 of a NestJS full-stack
 # 1. Install dependencies (from repo root — npm workspaces)
 npm install
 
-# 2. Start the web app (hot-reload)
+# 2. Start Postgres (Docker)
+cp .env.example .env   # if you do not already have .env
+npm run db:up
+npm run db:push        # create/sync Drizzle schema
+npm run db:seed        # load mock workers/alerts/incidents
+
+# 3. Start the API (Nest watch mode) — http://localhost:3000
+npm run dev:api
+
+# 4. Start the web app (hot-reload) — http://localhost:5173
 npm run dev:web
 ```
 
-The app will be available at **http://localhost:5173**.
+Web: **http://localhost:5173** · API: **http://localhost:3000** · Postgres: `localhost:5432` (user/pass/db: `safety` / `safety` / `safety_first`).
 
 ---
 
@@ -70,8 +82,14 @@ The app will be available at **http://localhost:5173**.
 |---------|-------------|
 | `npm run dev:web` | Start Vite dev server for `@safety-first/web` |
 | `npm run build:web` | TypeScript + production build for the web app |
+| `npm run dev:api` | Start NestJS API in watch mode |
+| `npm run build:api` | Compile the API to `apps/api/dist` |
+| `npm run typecheck:api` | Typecheck the API |
+| `npm run db:up` | `docker compose up -d postgres` |
+| `npm run db:down` | Stop compose services |
+| `npm run db:push` | Push Drizzle schema to Postgres |
+| `npm run db:seed` | Seed DB from mock data (web mock equivalent) |
 | `npm run lint` | Lint the web app with ESLint |
-| `npm run dev -w @safety-first/web` | Same as `dev:web` (workspace form) |
 | `npm run preview -w @safety-first/web` | Preview production build locally |
 
 ---
@@ -97,11 +115,25 @@ safety-first-dashboard-app/
 │   │       ├── domain/
 │   │       ├── hooks/
 │   │       └── pages/
-│   └── api/                     # NestJS placeholder (@safety-first/api)
-└── packages/
-    └── shared/                  # Shared types (@safety-first/shared)
-        └── src/index.ts
+│   └── api/                     # NestJS + Drizzle API (@safety-first/api)
+├── packages/
+│   └── shared/                  # Shared types (@safety-first/shared)
+│       └── src/index.ts
+├── docker-compose.yml           # Postgres (+ optional redis profile)
+└── .env.example                 # DATABASE_URL, PORT
 ```
+
+### API endpoints (step 1)
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/health` | Health check |
+| GET | `/workers` | List workers |
+| GET | `/workers/:id` | Worker detail |
+| GET | `/alerts` | List alerts |
+| PATCH | `/alerts/:id/acknowledge` | Acknowledge an alert |
+| GET | `/incidents` | List incidents |
+| GET | `/stats` | Dashboard aggregates |
 
 ---
 
@@ -126,10 +158,10 @@ The app uses **mock data** for demonstration. The simulated data sources include
 
 ## 🧪 Production Roadmap
 
-- Replace mock data with real API calls (REST / GraphQL)
+- Wire frontend TanStack Query to the Nest API (step 2)
 - Add authentication & authorization
-- Unit & integration tests (Vitest + React Testing Library)
+- Unit & integration tests (Vitest + React Testing Library / Nest testing)
 - WebSocket for real-time updates
-- Docker containerization
+- Full Docker Compose (API + web + postgres)
 - CI/CD pipeline
 
