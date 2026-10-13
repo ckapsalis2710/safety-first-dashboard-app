@@ -1,4 +1,4 @@
-import { workers, alerts, incidents, robotData, roleStats, siteStats } from './mockData';
+import { workers, alerts, incidents, roleStats, siteStats } from './mockData';
 import { getAlertCounts } from '../domain/alerts';
 import type { DashboardData, DashboardStats } from '../types';
 
@@ -43,16 +43,6 @@ export const getDashboardData = (): DashboardData => {
   };
 };
 
-// Helper to get worker by ID
-export const getWorkerById = (id: string) => {
-  return workers.find(w => w.id === id);
-};
-
-// Helper to get alerts for a specific worker
-export const getAlertsByWorkerId = (workerId: string) => {
-  return alerts.filter(a => a.workerId === workerId);
-};
-
 // Helper to get incidents for a specific worker
 export const getIncidentsByWorkerId = (workerId: string) => {
   return incidents.filter(i => i.workerId === workerId);
@@ -63,12 +53,3 @@ export const getSiteStats = () => siteStats;
 
 // Helper to get role statistics
 export const getRoleStats = () => roleStats;
-
-export const allData = {
-  workers,
-  alerts,
-  incidents,
-  robotData,
-  roleStats,
-  siteStats,
-};
