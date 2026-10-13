@@ -1,11 +1,11 @@
 import { workers, alerts, incidents, robotData, roleStats, siteStats } from './mockData';
+import { getAlertCounts } from '../domain/alerts';
 import type { DashboardData, DashboardStats } from '../types';
 
 export const getDashboardData = (): DashboardData => {
   const totalWorkers = workers.length;
   const compliantWorkers = workers.filter(w => w.compliant).length;
-  const activeAlerts = alerts.filter(a => !a.acknowledged).length;
-  const criticalAlerts = alerts.filter(a => a.severity === 'critical' && !a.acknowledged).length;
+  const alertCounts = getAlertCounts(alerts);
 
   const workersBySite = workers.reduce((acc, w) => {
     acc[w.site] = (acc[w.site] || 0) + 1;
@@ -28,8 +28,8 @@ export const getDashboardData = (): DashboardData => {
   const stats: DashboardStats = {
     totalWorkers,
     complianceRate: Math.round((compliantWorkers / totalWorkers) * 100),
-    activeAlerts,
-    criticalAlerts,
+    activeAlerts: alertCounts.total,
+    criticalAlerts: alertCounts.critical,
     workersBySite,
     alertsBySeverity,
     complianceTrend,
