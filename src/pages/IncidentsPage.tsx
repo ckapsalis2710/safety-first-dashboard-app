@@ -33,13 +33,24 @@ const IncidentsPage = ({ toggleTheme, isDarkMode, notificationMenu }: IncidentsP
   const data = getDashboardData();
   const incidents = data.incidents;
 
-  // Monthly data with bubbles
-  const monthlyData = useMemo(() => {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-    return months.map((month) => {
-      const count = Math.floor(Math.random() * 5);
+  // Monthly incident counts from the records available in this mock sample
+  const monthlyCounts = incidents.reduce<Record<string, number>>((counts, incident) => {
+    const month = incident.date.slice(0, 7);
+    counts[month] = (counts[month] || 0) + 1;
+    return counts;
+  }, {});
+
+  const monthlyData = Object.entries(monthlyCounts)
+    .sort(([monthA], [monthB]) => monthA.localeCompare(monthB))
+    .map(([yearMonth, count]) => {
+      const [year, monthNumber] = yearMonth.split('-').map(Number);
+      const month = new Intl.DateTimeFormat('en-US', {
+        month: 'short',
+        year: 'numeric',
+        timeZone: 'UTC',
+      }).format(new Date(Date.UTC(year, monthNumber - 1, 1)));
       const size = count > 0 ? 20 + count * 10 : 16;
-      let color;
+      let color = theme.palette.info.main;
       if (count === 0) {
         color = theme.palette.success.main;
       } else if (count >= 4) {
@@ -56,16 +67,18 @@ const IncidentsPage = ({ toggleTheme, isDarkMode, notificationMenu }: IncidentsP
         color,
       };
     });
-  }, []);
 
-  // Shift data with bars
-  const shiftData = useMemo(() => {
-    const hours = ['6am', '8am', '10am', '12pm', '2pm', '4pm', '6pm', '8pm', '10pm', '12am', '2am', '4am'];
-    return hours.map((hour) => ({
-      hour,
-      incidents: Math.floor(Math.random() * 4),
-    }));
-  }, []);
+  // Shift counts from the categories recorded on each incident
+  const shifts = ['morning', 'afternoon', 'night'] as const;
+  const shiftCounts = incidents.reduce<Record<string, number>>((counts, incident) => {
+    const shift = incident.conditions.shift;
+    counts[shift] = (counts[shift] || 0) + 1;
+    return counts;
+  }, {});
+  const shiftData = shifts.map((shift) => ({
+    shift,
+    incidents: shiftCounts[shift] || 0,
+  }));
 
   // Get color for shift bar (consistent with monthly chart)
   const getShiftBarColor = (value: number) => {
@@ -148,11 +161,14 @@ const IncidentsPage = ({ toggleTheme, isDarkMode, notificationMenu }: IncidentsP
       <React.Fragment>
       {/* Charts Section */}
       <Grid container spacing={3}>
-        {/* Monthly Incident Trend - Bubbles without Y-axis */}
+        {/* Monthly Incident Counts - Bubbles without Y-axis */}
         <Grid size={{ xs: 12, md: 6 }}>
           <Paper sx={{ p: 2, height: '100%' }}>
             <Typography variant="h6" sx={{ mb: 2 }}>
-              Monthly Incident Trend
+              Monthly Incident Counts
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+              Counts from the current mock incident sample; not a complete operational history.
             </Typography>
             <Box sx={{ display: 'flex', height: 250, pt: 2 }}>
               {/* Chart area */}
@@ -160,8 +176,8 @@ const IncidentsPage = ({ toggleTheme, isDarkMode, notificationMenu }: IncidentsP
                 {/* Bubbles positioned from bottom */}
                 <Box sx={{ display: 'flex', justifyContent: 'space-around', alignItems: 'flex-end', height: '100%' }}>
                   {monthlyData.map((data) => {
-                    // Calculate height based on count (max 5)
-                    const heightPercent = data.count > 0 ? (data.count / 5) * 80 : 0;
+                    // Keep the bubble position within the chart for larger sample counts
+                    const heightPercent = data.count > 0 ? Math.min((data.count / 5) * 80, 80) : 0;
                     return (
                       <Box key={data.month} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'flex-end', pb: 2 }}>
                         <Box
@@ -210,7 +226,7 @@ const IncidentsPage = ({ toggleTheme, isDarkMode, notificationMenu }: IncidentsP
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Box sx={{ width: 28, height: 28, borderRadius: '50%', bgcolor: theme.palette.error.main }} />
-                <Typography variant="caption">3+</Typography>
+                <Typography variant="caption">4+</Typography>
               </Box>
             </Box>
           </Paper>
@@ -220,14 +236,14 @@ const IncidentsPage = ({ toggleTheme, isDarkMode, notificationMenu }: IncidentsP
         <Grid size={{ xs: 12, md: 6 }}>
           <Paper sx={{ p: 2, height: '100%' }}>
             <Typography variant="h6" sx={{ mb: 2 }}>
-              Incidents by Shift Hour
+              Incidents by Shift
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'flex-end', height: 220, gap: 0.5, pt: 2 }}>
               {shiftData.map((data) => {
                 const color = getShiftBarColor(data.incidents);
                 const height = data.incidents > 0 ? data.incidents * 40 + 20 : 8;
                 return (
-                  <Box key={data.hour} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
+                  <Box key={data.shift} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
                     <Box
                       sx={{
                         width: '100%',
@@ -243,7 +259,7 @@ const IncidentsPage = ({ toggleTheme, isDarkMode, notificationMenu }: IncidentsP
                       }}
                     />
                     <Typography variant="caption" sx={{ mt: 0.5, fontSize: '0.5rem' }}>
-                      {data.hour}
+                      {data.shift.charAt(0).toUpperCase() + data.shift.slice(1)} ({data.incidents})
                     </Typography>
                   </Box>
                 );
