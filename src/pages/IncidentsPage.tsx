@@ -132,15 +132,6 @@ const IncidentsPage = ({ toggleTheme, isDarkMode, notificationMenu }: IncidentsP
     return theme.palette.success.main;
   };
 
-  // Stable random times for each incident (memoized so they don't change on re-render)
-  const incidentTimes = useMemo(() => {
-    return incidents.slice(0, 8).map(() => {
-      const hours = Math.floor(Math.random() * 12) + 6;
-      const minutes = Math.floor(Math.random() * 60);
-      return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-    });
-  }, [incidents]);
-
   return (
     <Box>
       <PageHeader
@@ -346,9 +337,6 @@ const IncidentsPage = ({ toggleTheme, isDarkMode, notificationMenu }: IncidentsP
                             <TableCell>
                               <Typography variant="body2">
                                 {incident.date}
-                              </Typography>
-                              <Typography variant="caption" color="text.secondary">
-                                {incidentTimes[index]}
                               </Typography>
                             </TableCell>
                             <TableCell>{incident.role}</TableCell>
