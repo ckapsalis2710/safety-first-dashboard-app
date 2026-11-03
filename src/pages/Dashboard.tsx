@@ -26,10 +26,13 @@ interface DashboardProps {
   isDarkMode: boolean;
   notificationMenu?: ReactNode;
   alerts: import('../types').Alert[];
+  alertsStatus: 'loading' | 'success' | 'error';
+  pendingAlertIds: ReadonlySet<string>;
+  onRetryAlerts: () => void;
   onAcknowledgeAlert: (alertId: string) => void;
 }
 
-const Dashboard = ({ toggleTheme, isDarkMode, notificationMenu, alerts, onAcknowledgeAlert }: DashboardProps) => {
+const Dashboard = ({ toggleTheme, isDarkMode, notificationMenu, alerts, alertsStatus, pendingAlertIds, onRetryAlerts, onAcknowledgeAlert }: DashboardProps) => {
   const theme = useTheme();
   const data = getDashboardData();
   const loading = useSimulatedLoading(700);
@@ -53,13 +56,15 @@ const Dashboard = ({ toggleTheme, isDarkMode, notificationMenu, alerts, onAcknow
     },
     {
       label: 'Active Alerts',
-      value: alertCounts.total,
+      value: alertsStatus === 'success' ? alertCounts.total : '—',
+      helperText: alertsStatus === 'loading' ? 'Loading alerts…' : alertsStatus === 'error' ? 'Alerts unavailable' : undefined,
       icon: Warning,
       color: theme.palette.warning.main,
     },
     {
       label: 'Critical',
-      value: alertCounts.critical,
+      value: alertsStatus === 'success' ? alertCounts.critical : '—',
+      helperText: alertsStatus === 'loading' ? 'Loading alerts…' : alertsStatus === 'error' ? 'Alerts unavailable' : undefined,
       icon: Error,
       color: theme.palette.error.main,
     },
@@ -115,6 +120,7 @@ const Dashboard = ({ toggleTheme, isDarkMode, notificationMenu, alerts, onAcknow
                 <Typography variant="body2" color="text.secondary">
                   {kpi.label}
                 </Typography>
+                {kpi.helperText && <Typography variant="caption" color="text.secondary">{kpi.helperText}</Typography>}
               </Box>
             </Paper>
           </Grid>
@@ -129,6 +135,9 @@ const Dashboard = ({ toggleTheme, isDarkMode, notificationMenu, alerts, onAcknow
         {/* Alerts Panel - Right side */}
         <AlertsPanel
           alerts={alerts}
+          alertsStatus={alertsStatus}
+          pendingAlertIds={pendingAlertIds}
+          onRetryAlerts={onRetryAlerts}
           workers={data.workers}
           onAcknowledgeAlert={onAcknowledgeAlert}
         />

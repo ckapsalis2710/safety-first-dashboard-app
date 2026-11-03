@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Chip,
+  CircularProgress,
   FormControl,
   Grid,
   InputLabel,
@@ -18,12 +19,18 @@ import { getAlertCounts } from '../../domain/alerts';
 
 interface AlertsPanelProps {
   alerts: Alert[];
+  alertsStatus: 'loading' | 'success' | 'error';
+  pendingAlertIds: ReadonlySet<string>;
+  onRetryAlerts: () => void;
   workers: Worker[];
   onAcknowledgeAlert: (alertId: string) => void;
 }
 
 const AlertsPanel = ({
   alerts,
+  alertsStatus,
+  pendingAlertIds,
+  onRetryAlerts,
   workers,
   onAcknowledgeAlert,
 }: AlertsPanelProps) => {
@@ -108,7 +115,7 @@ const AlertsPanel = ({
             Alerts
           </Typography>
 
-          {alertCounts.total > 0 && (
+          {alertsStatus === 'success' && alertCounts.total > 0 && (
             <Box
               sx={{
                 display: 'flex',
@@ -185,6 +192,7 @@ const AlertsPanel = ({
           }}
         >
           <FormControl
+            disabled={alertsStatus !== 'success'}
             size="small"
             sx={{ minWidth: 120, flex: 1 }}
           >
@@ -206,6 +214,7 @@ const AlertsPanel = ({
           </FormControl>
 
           <FormControl
+            disabled={alertsStatus !== 'success'}
             size="small"
             sx={{ minWidth: 120, flex: 1 }}
           >
@@ -231,7 +240,19 @@ const AlertsPanel = ({
 
         {/* Alert List */}
         <Box sx={{ flex: 1, overflow: 'auto' }}>
-          {filteredAlerts.slice(0, 6).map((alert) => (
+          {alertsStatus === 'loading' && (
+            <Box role="status" sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 2 }}>
+              <CircularProgress size={18} />
+              <Typography color="text.secondary">Loading alerts…</Typography>
+            </Box>
+          )}
+          {alertsStatus === 'error' && (
+            <Box sx={{ py: 2 }}>
+              <Typography color="text.secondary">Alerts could not be loaded.</Typography>
+              <Button onClick={onRetryAlerts}>Retry</Button>
+            </Box>
+          )}
+          {alertsStatus === 'success' && filteredAlerts.slice(0, 6).map((alert) => (
             <Paper
               key={alert.id}
               variant="outlined"
@@ -294,6 +315,8 @@ const AlertsPanel = ({
                 />
 
                 <Button
+                  disabled={pendingAlertIds.has(alert.id)}
+                  aria-label={`Acknowledge alert: ${alert.message}`}
                   size="small"
                   variant="outlined"
                   onClick={(event) => {
@@ -312,13 +335,13 @@ const AlertsPanel = ({
                     },
                   }}
                 >
-                  Ack
+                  {pendingAlertIds.has(alert.id) ? 'Saving…' : 'Ack'}
                 </Button>
               </Box>
             </Paper>
           ))}
 
-          {filteredAlerts.length === 0 && (
+          {alertsStatus === 'success' && filteredAlerts.length === 0 && (
             <Typography
               color="text.secondary"
               sx={{
@@ -330,7 +353,7 @@ const AlertsPanel = ({
             </Typography>
           )}
 
-          {filteredAlerts.length > 6 && (
+          {alertsStatus === 'success' && filteredAlerts.length > 6 && (
             <Typography
               variant="body2"
               sx={{

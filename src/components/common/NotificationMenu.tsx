@@ -8,6 +8,8 @@ import {
   Chip,
   IconButton,
   Badge,
+  Button,
+  CircularProgress,
   useTheme,
 } from '@mui/material';
 import { Notifications, Check } from '@mui/icons-material';
@@ -15,10 +17,13 @@ import type { Alert } from '../../types';
 
 interface NotificationMenuProps {
   alerts: Alert[];
+  alertsStatus: 'loading' | 'success' | 'error';
+  pendingAlertIds: ReadonlySet<string>;
+  onRetryAlerts: () => void;
   onAcknowledge: (alertId: string) => void;
 }
 
-const NotificationMenu = ({ alerts, onAcknowledge }: NotificationMenuProps) => {
+const NotificationMenu = ({ alerts, alertsStatus, pendingAlertIds, onRetryAlerts, onAcknowledge }: NotificationMenuProps) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const open = Boolean(anchorEl);
@@ -44,9 +49,9 @@ const NotificationMenu = ({ alerts, onAcknowledge }: NotificationMenuProps) => {
 
   return (
     <>
-      <IconButton onClick={handleClick} size="small">
-        <Badge badgeContent={unacknowledgedAlerts.length} color="error">
-          <Notifications />
+      <IconButton onClick={handleClick} size="small" aria-label={alertsStatus === 'loading' ? 'Loading alerts' : alertsStatus === 'error' ? 'Alerts unavailable' : `${unacknowledgedAlerts.length} unacknowledged alerts`}>
+        <Badge badgeContent={alertsStatus === 'success' ? unacknowledgedAlerts.length : alertsStatus === 'error' ? '!' : undefined} color="error">
+          {alertsStatus === 'loading' ? <CircularProgress size={20} /> : <Notifications />}
         </Badge>
       </IconButton>
 
@@ -80,7 +85,16 @@ const NotificationMenu = ({ alerts, onAcknowledge }: NotificationMenuProps) => {
           </Typography>
         </Box>
 
-        {unacknowledgedAlerts.length === 0 ? (
+        {alertsStatus === 'loading' ? (
+          <Box role="status" sx={{ p: 3 }}>
+            <Typography color="text.secondary">Loading alerts…</Typography>
+          </Box>
+        ) : alertsStatus === 'error' ? (
+          <Box sx={{ p: 3 }}>
+            <Typography color="text.secondary">Alerts could not be loaded.</Typography>
+            <Button onClick={onRetryAlerts}>Retry</Button>
+          </Box>
+        ) : unacknowledgedAlerts.length === 0 ? (
           <Box sx={{ p: 3, textAlign: 'center' }}>
             <Typography color="text.secondary">No new notifications</Typography>
           </Box>
@@ -117,11 +131,13 @@ const NotificationMenu = ({ alerts, onAcknowledge }: NotificationMenuProps) => {
                   </Typography>
                 </Box>
                 <IconButton
+                  disabled={pendingAlertIds.has(alert.id)}
+                  aria-label={`Acknowledge alert: ${alert.message}`}
                   size="small"
                   onClick={() => onAcknowledge(alert.id)}
                   sx={{ mt: 0.5 }}
                 >
-                  <Check fontSize="small" />
+                  {pendingAlertIds.has(alert.id) ? <CircularProgress size={16} /> : <Check fontSize="small" />}
                 </IconButton>
               </ListItem>
             ))}
