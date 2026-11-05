@@ -26,6 +26,13 @@ const getAlerts = async (baseUrl: string) => {
 const acknowledge = (baseUrl: string, id: string) =>
   fetch(`${baseUrl}/api/alerts/${encodeURIComponent(id)}/acknowledge`, { method: 'PATCH' });
 
+test('GET /health returns the service liveness response', async (t) => {
+  const baseUrl = await startServer(t, []);
+  const response = await fetch(`${baseUrl}/health`);
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { status: 'ok', service: 'safetyfirst-api' });
+});
+
 test('GET returns all alerts newest-first, with an ascending ID tie-breaker', async (t) => {
   const initial: AlertDto[] = [
     { ...alertSeed[0], id: 'tie-b', timestamp: '2026-07-14T09:00:00Z' },

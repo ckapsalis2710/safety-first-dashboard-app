@@ -12,6 +12,11 @@ export const createApp = (initialAlerts: readonly AlertDto[]) => {
     next();
   });
 
+  // Liveness only: confirms HTTP service availability, not dependency readiness.
+  app.get('/health', (_request, response) => {
+    response.status(200).json({ status: 'ok', service: 'safetyfirst-api' });
+  });
+
   app.get('/api/alerts', (_request, response) => {
     const orderedAlerts = [...alerts].sort((a, b) => {
       const timeDifference = Date.parse(b.timestamp) - Date.parse(a.timestamp);
