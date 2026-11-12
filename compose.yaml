@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:17.11-bookworm
+    environment:
+      # Local development credentials only; the port is bound to loopback.
+      POSTGRES_USER: safetyfirst
+      POSTGRES_PASSWORD: safetyfirst_local_only
+      POSTGRES_DB: safetyfirst_dev
+    ports:
+      - '127.0.0.1:5433:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres/init-test-db.sql:/docker-entrypoint-initdb.d/10-test-db.sql:ro
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-h', '127.0.0.1', '-U', 'safetyfirst', '-d', 'safetyfirst_dev']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  postgres-data:

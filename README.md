@@ -50,6 +50,34 @@ npm run dev
 
 The app will be available at **http://localhost:5173**.
 
+### Local PostgreSQL
+
+The Alerts API still runs in memory. PostgreSQL is optional for running the current app and is used here to verify the database connection.
+
+```bash
+docker compose up -d --wait db
+cp .env.example .env.server.local
+npm run db:check
+```
+
+In PowerShell, use `Copy-Item .env.example .env.server.local` in place of `cp`. The database is bound to `127.0.0.1:5433`; the example credentials are for local use only.
+
+The named `postgres-data` volume stores both `safetyfirst_dev` and `safetyfirst_test`. The PostgreSQL image creates the development database and runs `docker/postgres/init-test-db.sql` to create the test database on first initialization. Existing volumes are preserved. If you already have an initialized volume without the test database, create it once with:
+
+```bash
+docker compose exec -T db psql -U safetyfirst -d postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE safetyfirst_test"
+```
+
+To check the separate test database, copy `.env.example` to `.env.server.test.local`, change the database name at the end of `DATABASE_URL` to `safetyfirst_test`, and run:
+
+```bash
+node --env-file=.env.server.test.local server/db/check.ts
+```
+
+These files are ignored by Git and loaded by Node for the check. An already exported `DATABASE_URL` takes precedence; clear it before checking the database specified by an environment file. Keep the URL on the server and never give it a `VITE_` prefix. The databases share the local server and credentials but have separate data and schemas. Existing HTTP tests still use in-memory alerts.
+
+Use `docker compose stop db` to stop PostgreSQL while retaining the volume. Neither Express startup nor `db:check` applies migrations or resets data. `drizzle.config.ts` reserves the schema and migration paths for the next step and reads `DATABASE_URL` from its process environment.
+
 ---
 
 ## 📜 Available Scripts
@@ -60,6 +88,7 @@ The app will be available at **http://localhost:5173**.
 | `npm run build` | TypeScript compilation + production build (output: `dist/`) |
 | `npm run preview` | Preview production build locally |
 | `npm run lint` | Lint code with ESLint |
+| `npm run db:check` | Run `SELECT 1` against the server-only `DATABASE_URL` |
 
 ---
 
