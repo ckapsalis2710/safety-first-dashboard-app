@@ -12,7 +12,9 @@
     "build:server": "tsc -p tsconfig.server.json",
     "start:server": "node dist-server/server/index.js",
     "test:server": "npm run build:server && node --test dist-server/server/alerts.test.js",
-    "db:check": "node --env-file-if-exists=.env.server.local server/db/check.ts"
+    "db:check": "node --env-file-if-exists=.env.server.local server/db/check.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate"
   },
   "engines": {
     "node": ">=24.0.0"

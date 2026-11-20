@@ -76,7 +76,19 @@ node --env-file=.env.server.test.local server/db/check.ts
 
 These files are ignored by Git and loaded by Node for the check. An already exported `DATABASE_URL` takes precedence; clear it before checking the database specified by an environment file. Keep the URL on the server and never give it a `VITE_` prefix. The databases share the local server and credentials but have separate data and schemas. Existing HTTP tests still use in-memory alerts.
 
-Use `docker compose stop db` to stop PostgreSQL while retaining the volume. Neither Express startup nor `db:check` applies migrations or resets data. `drizzle.config.ts` reserves the schema and migration paths for the next step and reads `DATABASE_URL` from its process environment.
+Use `docker compose stop db` to stop PostgreSQL while retaining the volume. Neither Express startup nor `db:check` applies migrations or resets data.
+
+### Database migrations
+
+Apply the committed migrations explicitly from the repository root. Clear any exported URL so the chosen environment file selects the target database.
+
+```powershell
+Remove-Item Env:DATABASE_URL -ErrorAction SilentlyContinue
+node --env-file=.env.server.local ./node_modules/drizzle-kit/bin.cjs migrate
+node --env-file=.env.server.test.local ./node_modules/drizzle-kit/bin.cjs migrate
+```
+
+With `DATABASE_URL` already set to the intended database, use `npm run db:migrate`. For schema changes, run `npm run db:generate -- --name=describe_change` and review the generated SQL before applying it. Drizzle tracks applied migrations in its own schema.
 
 ---
 
